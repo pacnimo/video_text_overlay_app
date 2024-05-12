@@ -5,8 +5,8 @@ import sys
 from contextlib import redirect_stdout
 import io
 
-# Define the directory path for stored files using the current working directory
-dir_path = os.path.join(os.getcwd(), "tempDir")
+# Define the directory path for stored files
+dir_path = "tempDir"
 
 # Ensure the directory exists
 os.makedirs(dir_path, exist_ok=True)
@@ -22,6 +22,7 @@ def save_uploaded_file(uploaded_file):
         return None
 
 def make_text_clip(text, start_time, end_time, style='Regular'):
+    # Changed font to 'DejaVu-Sans' which is typically more universally available
     try:
         return TextClip(text, fontsize=66, font='DejaVu-Sans', color='white') \
             .set_position(('center', 'bottom')) \
