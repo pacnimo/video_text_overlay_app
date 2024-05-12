@@ -1,6 +1,8 @@
 import streamlit as st
 from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
 import os
+os.environ['SERVER_ENABLECORS'] = 'false'
+os.environ['SERVER_ENABLEXSRFPROTECTION'] = 'false'
 import sys
 from contextlib import redirect_stdout
 import io
