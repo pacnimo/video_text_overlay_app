@@ -1,12 +1,14 @@
 import streamlit as st
 from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
 import os
+os.environ['SERVER_ENABLECORS'] = 'false'
+os.environ['SERVER_ENABLEXSRFPROTECTION'] = 'false'
 import sys
 from contextlib import redirect_stdout
 import io
 
-# Define the directory path for stored files
-dir_path = "tempDir"
+# Define the directory path for stored files using the current working directory
+dir_path = os.path.join(os.getcwd(), "tempDir")
 
 # Ensure the directory exists
 os.makedirs(dir_path, exist_ok=True)
@@ -22,24 +24,34 @@ def save_uploaded_file(uploaded_file):
         return None
 
 def make_text_clip(text, start_time, end_time, style='Regular'):
-    return TextClip(text, fontsize=66, font=f'Arial-{style}', color='white') \
-        .set_position(('center', 'bottom')) \
-        .set_start(start_time) \
-        .set_duration(end_time - start_time) \
-        .set_end(end_time) \
-        .margin(bottom=50, opacity=0)
+    try:
+        return TextClip(text, fontsize=66, font='DejaVu-Sans', color='white') \
+            .set_position(('center', 'bottom')) \
+            .set_start(start_time) \
+            .set_duration(end_time - start_time) \
+            .set_end(end_time) \
+            .margin(bottom=50, opacity=0)
+    except Exception as e:
+        st.error(f"Failed to create text clip: {e}")
+        return None  # Handle case where TextClip creation fails
 
 def process_video(video_path, text_lines, progress_bar):
     video = VideoFileClip(video_path)
-    text_clips = [
-        make_text_clip(
-            text=text_lines[i]['text'],
-            start_time=text_lines[i]['start'],
-            end_time=text_lines[i]['end'],
-            style=text_lines[i]['style']
-        )
-        for i in range(len(text_lines))
-    ]
+    text_clips = [make_text_clip(
+        text=line['text'],
+        start_time=line['start'],
+        end_time=line['end'],
+        style=line['style']
+    ) for line in text_lines if make_text_clip(
+        text=line['text'],
+        start_time=line['start'],
+        end_time=line['end'],
+        style=line['style']
+    ) is not None]  # Only use successful text clips
+
+    if not text_clips:  # Check if no text clips were created successfully
+        return None
+
     final_clip = CompositeVideoClip([video, *text_clips])
 
     output_path = os.path.join(dir_path, f"output_{os.path.basename(video_path)}")
@@ -80,9 +92,12 @@ if uploaded_file is not None:
             with st.spinner('Processing video...'):
                 progress_bar = st.progress(0)
                 output_video = process_video(video_path, text_lines, progress_bar)
-                progress_bar.empty()
-                st.video(output_video)
-                st.download_button('Download Video', data=open(output_video, 'rb'), file_name='output_video.mp4')
+                if output_video:
+                    progress_bar.empty()
+                    st.video(output_video)
+                    st.download_button('Download Video', data=open(output_video, 'rb'), file_name='output_video.mp4')
+                else:
+                    st.error("Failed to process video.")
     else:
         st.error("Failed to save uploaded video.")
 else:
