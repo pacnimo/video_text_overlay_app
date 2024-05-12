@@ -5,7 +5,7 @@ import sys
 from contextlib import redirect_stdout
 import io
 
-# Define the directory path for stored files / do we need a TOML file for that?
+# Define the directory path for stored files
 dir_path = "/mount/src/video_text_overlay_app/"
 
 # Ensure the directory exists
@@ -22,11 +22,12 @@ def save_uploaded_file(uploaded_file):
         return None
 
 def make_text_clip(text, start_time, end_time, style='Regular'):
-    return TextClip(text, fontsize=66, font=f'Arial-{style}', color='white') \
+    # Check and set the correct path to the font file if necessary
+    font_path = "/mount/src/video_text_overlay_app/Ruda-Bold.ttf"  # Adjust this path based on your environment
+    return TextClip(text, fontsize=66, font=font_path, color='white') \
         .set_position(('center', 'bottom')) \
         .set_start(start_time) \
         .set_duration(end_time - start_time) \
-        .set_end(end_time) \
         .margin(bottom=50, opacity=0)
 
 def process_video(video_path, text_lines, progress_bar):
@@ -47,7 +48,7 @@ def process_video(video_path, text_lines, progress_bar):
     # Capture stdout to parse for progress updates
     old_stdout = sys.stdout
     sys.stdout = io.StringIO()
-    
+
     try:
         final_clip.write_videofile(output_path, codec='libx264', verbose=True, logger=None)
         sys.stdout.seek(0)
