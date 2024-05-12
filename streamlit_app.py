@@ -1,3 +1,4 @@
+import tempfile  # Make sure to include this import at the top of your script
 import streamlit as st
 import numpy as np
 from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
