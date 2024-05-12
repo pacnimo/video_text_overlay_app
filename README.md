@@ -27,7 +27,11 @@ Ensure you have Python installed on your system. The app is built with Python an
 
 pip install -r requirements.txt
 
-3. Run the application:
+3. give tempDir the requiered rules
+
+   chmod 777 tempDir
+
+4. Run the application:
 
 streamlit run streamlit_app.py --server.enableCORS=false --server.enableXsrfProtection=false
 
