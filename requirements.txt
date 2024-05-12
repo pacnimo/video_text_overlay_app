@@ -1,0 +1,6 @@
+streamlit==1.17.0
+moviepy==1.0.3
+imageio==2.19.3
+imageio-ffmpeg==0.4.7
+numpy==1.23.1
+
