@@ -5,8 +5,8 @@ import sys
 from contextlib import redirect_stdout
 import io
 
-# Define the directory path for stored files
-dir_path = "tempDir"
+# Define the directory path for stored files / do we need a TOML file for that?
+dir_path = "/mount/src/video_text_overlay_app/"
 
 # Ensure the directory exists
 os.makedirs(dir_path, exist_ok=True)
