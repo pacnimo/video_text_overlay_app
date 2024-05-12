@@ -1,10 +1,8 @@
 import streamlit as st
 from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
-import os
-import tempfile
 
 def make_text_clip(text, start_time, end_time):
-    return TextClip(txt=text, fontsize=66, color='white', font='Arial') \
+    return TextClip(txt=text, fontsize=66, color='white') \
         .set_position('center').set_start(start_time) \
         .set_duration(end_time - start_time).margin(bottom=50)
 
@@ -18,16 +16,16 @@ st.title("Video Text Overlay App")
 
 uploaded_file = st.file_uploader("Upload your video", type=['mp4'])
 if uploaded_file is not None:
-    # Save uploaded file to a temporary directory
+    # Temporary file workaround for Streamlit Cloud
     with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmpfile:
-        tmpfile.write(uploaded_file.getvalue())
+        tmpfile.write(uploaded_file.read())
         video_file_path = tmpfile.name
 
     text_lines = [
         {'text': st.text_input(f"Text Line {i+1}", value=f"Text Line {i+1}"),
          'start': st.number_input(f"Start Time for Line {i+1}", min_value=0, value=i*5),
          'end': st.number_input(f"End Time for Line {i+1}", min_value=0, value=(i+1)*5)}
-        for i in range(4)  # Assuming up to 4 lines of text
+        for i in range(4)  # Configure for up to 4 lines of text
     ]
 
     if st.button("Create Video"):
@@ -38,7 +36,7 @@ if uploaded_file is not None:
             st.video(output_video_path)
             with open(output_video_path, 'rb') as file:
                 st.download_button('Download Video', file.read(), file_name='output_video.mp4')
-            # Optionally, clean up the temporary file
+            # Clean up the temporary file
             os.remove(video_file_path)
 else:
     st.warning("Please upload a video file.")
